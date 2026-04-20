@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>四冲程发动机工作原理演示</title>
+    
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                font-family: 'Noto Sans SC', sans-serif;
+                background: 
+                    radial-gradient(ellipse at 20% 20%, rgba(0, 100, 200, 0.15) 0%, transparent 50%),
+                    radial-gradient(ellipse at 80% 80%, rgba(0, 200, 255, 0.1) 0%, transparent 50%),
+                    radial-gradient(ellipse at 50% 50%, rgba(20, 20, 40, 1) 0%, rgba(5, 5, 10, 1) 100%);
+                color: #e0e0e0;
+                overflow-x: hidden;
+                min-height: 100vh;
+            }
+            .font-tech {
+                font-family: 'Orbitron', sans-serif;
+            }
+        }
+        
+        @layer components {
+            .panel-glass {
+                background: rgba(15, 20, 35, 0.75);
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(100, 200, 255, 0.15);
+                box-shadow: 
+                    0 4px 30px rgba(0, 0, 0, 0.3),
+                    0 0 30px rgba(0, 150, 255, 0.08),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+                transition: all 0.3s ease;
+            }
+            
+            .panel-glass:hover {
+                border-color: rgba(100, 200, 255, 0.25);
+                box-shadow: 
+                    0 4px 30px rgba(0, 0, 0, 0.3),
+                    0 0 40px rgba(0, 150, 255, 0.12),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            }
+            
+            .neon-text {
+                text-shadow: 
+                    0 0 5px rgba(100, 200, 255, 0.8),
+                    0 0 10px rgba(100, 200, 255, 0.5),
+                    0 0 20px rgba(100, 200, 255, 0.3),
+                    0 0 40px rgba(0, 150, 255, 0.2);
+            }
+            
+            .neon-border {
+                box-shadow: 
+                    0 0 20px rgba(0, 150, 255, 0.2),
+                    inset 0 0 20px rgba(0, 150, 255, 0.05);
+            }
+            
+            .glow-blue {
+                box-shadow: 0 0 20px rgba(0, 200, 255, 0.5);
+            }
+            
+            .glow-orange {
+                box-shadow: 0 0 20px rgba(255, 150, 0, 0.5);
+            }
+            
+            .btn-tech {
+                background: linear-gradient(145deg, rgba(26, 26, 46, 0.9), rgba(22, 33, 62, 0.9));
+                border: 1px solid rgba(100, 200, 255, 0.2);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .btn-tech::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+                transition: left 0.5s;
+            }
+            
+            .btn-tech:hover::before {
+                left: 100%;
+            }
+            
+            .btn-tech:hover {
+                background: linear-gradient(145deg, rgba(22, 33, 62, 0.95), rgba(26, 26, 46, 0.95));
+                border-color: rgba(100, 200, 255, 0.5);
+                box-shadow: 
+                    0 0 20px rgba(0, 150, 255, 0.4),
+                    0 4px 15px rgba(0, 0, 0, 0.3);
+                transform: translateY(-2px);
+            }
+            
+            .btn-tech:active {
+                transform: translateY(0);
+            }
+            
+            .btn-tech.active {
+                background: linear-gradient(145deg, rgba(0, 150, 255, 0.3), rgba(0, 100, 200, 0.2));
+                border-color: rgba(0, 200, 255, 0.6);
+                box-shadow: 0 0 25px rgba(0, 200, 255, 0.4);
+            }
+            
+            .slider-tech {
+                -webkit-appearance: none;
+                appearance: none;
+                background: linear-gradient(to right, rgba(26, 26, 46, 0.8), rgba(15, 52, 96, 0.8));
+                border-radius: 10px;
+                height: 8px;
+                outline: none;
+                border: 1px solid rgba(100, 200, 255, 0.1);
+            }
+            
+            .slider-tech::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 22px;
+                height: 22px;
+                background: linear-gradient(145deg, #00d4ff, #0099cc);
+                border-radius: 50%;
+                cursor: pointer;
+                box-shadow: 
+                    0 0 15px rgba(0, 212, 255, 0.6),
+                    0 0 30px rgba(0, 212, 255, 0.3);
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                transition: all 0.2s ease;
+            }
+            
+            .slider-tech::-webkit-slider-thumb:hover {
+                transform: scale(1.1);
+                box-shadow: 
+                    0 0 20px rgba(0, 212, 255, 0.8),
+                    0 0 40px rgba(0, 212, 255, 0.4);
+            }
+            
+            .slider-tech::-moz-range-thumb {
+                width: 22px;
+                height: 22px;
+                background: linear-gradient(145deg, #00d4ff, #0099cc);
+                border-radius: 50%;
+                cursor: pointer;
+                box-shadow: 
+                    0 0 15px rgba(0, 212, 255, 0.6),
+                    0 0 30px rgba(0, 212, 255, 0.3);
+                border: 2px solid rgba(255, 255, 255, 0.2);
+            }
+            
+            .stroke-indicator {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                cursor: pointer;
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .stroke-indicator::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                width: 3px;
+                background: transparent;
+                transition: background 0.3s ease;
+            }
+            
+            .stroke-indicator:hover {
+                transform: translateX(5px);
+                background: rgba(255, 255, 255, 0.05);
+            }
+            
+            .stroke-active {
+                background: linear-gradient(145deg, rgba(0, 150, 255, 0.2), rgba(0, 100, 200, 0.1));
+                border-color: rgba(0, 200, 255, 0.5);
+                box-shadow: 
+                    0 0 25px rgba(0, 150, 255, 0.25),
+                    inset 0 0 20px rgba(0, 150, 255, 0.1);
+            }
+            
+            .stroke-active::before {
+                background: linear-gradient(to bottom, #00d4ff, #0099cc);
+            }
+            
+            .grid-bg {
+                position: relative;
+            }
+            
+            .grid-bg::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image: 
+                    linear-gradient(rgba(0, 150, 255, 0.04) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0, 150, 255, 0.04) 1px, transparent 1px);
+                background-size: 50px 50px;
+                pointer-events: none;
+                z-index: 0;
+            }
+            
+            .grid-bg::after {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: 
+                    radial-gradient(circle at 30% 20%, rgba(0, 200, 255, 0.03) 0%, transparent 40%),
+                    radial-gradient(circle at 70% 80%, rgba(100, 100, 255, 0.03) 0%, transparent 40%);
+                pointer-events: none;
+                z-index: 0;
+            }
+            
+            .canvas-container {
+                position: relative;
+                background: linear-gradient(145deg, rgba(10, 12, 20, 0.9), rgba(15, 18, 30, 0.9));
+                border: 1px solid rgba(100, 200, 255, 0.2);
+                box-shadow: 
+                    inset 0 0 60px rgba(0, 150, 255, 0.05),
+                    0 0 40px rgba(0, 0, 0, 0.4);
+            }
+            
+            .canvas-container::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, rgba(0, 200, 255, 0.5), transparent);
+            }
+            
+            .title-decoration {
+                position: relative;
+                display: inline-block;
+            }
+            
+            .title-decoration::after {
+                content: '';
+                position: absolute;
+                bottom: -5px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 60%;
+                height: 2px;
+                background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+            }
+            
+            .stat-card {
+                background: linear-gradient(145deg, rgba(20, 25, 40, 0.8), rgba(15, 20, 35, 0.8));
+                border: 1px solid rgba(100, 200, 255, 0.1);
+                transition: all 0.3s ease;
+            }
+            
+            .stat-card:hover {
+                border-color: rgba(100, 200, 255, 0.25);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            }
+            
+            .progress-glow {
+                box-shadow: 0 0 10px currentColor;
+            }
+            
+            kbd {
+                background: linear-gradient(145deg, #2a2a3e, #1a1a2e);
+                border: 1px solid rgba(100, 200, 255, 0.2);
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+                transition: all 0.2s ease;
+            }
+            
+            kbd:hover {
+                border-color: rgba(100, 200, 255, 0.4);
+                box-shadow: 0 0 10px rgba(0, 150, 255, 0.2);
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen grid-bg relative">
+    <!-- 装饰性角落元素 -->
+    <div class="fixed top-0 left-0 w-32 h-32 pointer-events-none z-10">
+        <div class="absolute top-4 left-4 w-16 h-16 border-l-2 border-t-2 border-cyan-500/30 rounded-tl-lg"></div>
+        <div class="absolute top-8 left-8 w-8 h-8 border-l border-t border-cyan-400/20 rounded-tl"></div>
+    </div>
+    <div class="fixed top-0 right-0 w-32 h-32 pointer-events-none z-10">
+        <div class="absolute top-4 right-4 w-16 h-16 border-r-2 border-t-2 border-cyan-500/30 rounded-tr-lg"></div>
+        <div class="absolute top-8 right-8 w-8 h-8 border-r border-t border-cyan-400/20 rounded-tr"></div>
+    </div>
+    <div class="fixed bottom-0 left-0 w-32 h-32 pointer-events-none z-10">
+        <div class="absolute bottom-4 left-4 w-16 h-16 border-l-2 border-b-2 border-cyan-500/30 rounded-bl-lg"></div>
+        <div class="absolute bottom-8 left-8 w-8 h-8 border-l border-b border-cyan-400/20 rounded-bl"></div>
+    </div>
+    <div class="fixed bottom-0 right-0 w-32 h-32 pointer-events-none z-10">
+        <div class="absolute bottom-4 right-4 w-16 h-16 border-r-2 border-b-2 border-cyan-500/30 rounded-br-lg"></div>
+        <div class="absolute bottom-8 right-8 w-8 h-8 border-r border-b border-cyan-400/20 rounded-br"></div>
+    </div>
+
+    <!-- 主容器 - 三栏布局 -->
+    <div class="relative z-10 flex flex-col lg:flex-row min-h-screen p-4 lg:p-5 gap-4 lg:gap-5">
+        
+        <!-- 左侧：实时参数面板 -->
+        <div class="w-full lg:w-[320px] xl:w-[340px] flex flex-col gap-4">
+            <!-- 标题 -->
+            <div class="panel-glass rounded-2xl p-4 text-center">
+                <div class="w-10 h-10 mx-auto rounded-full bg-gradient-to-br from-cyan-500/20 to-blue-600/20 flex items-center justify-center border border-cyan-500/30 mb-2">
+                    <i class="fas fa-cog fa-spin text-xl text-cyan-400" style="animation-duration: 4s;"></i>
+                </div>
+                <h1 class="text-lg xl:text-xl font-tech font-bold neon-text text-cyan-400">
+                    四冲程发动机
+                </h1>
+                <p class="text-xs text-gray-400 mt-1">交互式演示系统</p>
+            </div>
+            
+            <!-- 实时参数 -->
+            <div class="panel-glass rounded-2xl p-4 flex-1">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-tech text-base font-semibold text-cyan-400 flex items-center">
+                        <i class="fas fa-tachometer-alt mr-2"></i>
+                        实时参数
+                    </h2>
+                    <div class="flex items-center gap-1.5">
+                        <div class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                        <span class="text-[10px] text-gray-500 font-tech">LIVE</span>
+                    </div>
+                </div>
+                
+                <!-- 曲轴角度 -->
+                <div class="mb-4">
+                    <div class="flex justify-between text-xs text-gray-400 mb-1.5">
+                        <span class="flex items-center gap-1.5">
+                            <i class="fas fa-sync-alt text-cyan-500/50 text-[10px]"></i>
+                            曲轴角度
+                        </span>
+                        <span id="angleDisplay" class="font-tech text-cyan-400">0°</span>
+                    </div>
+                    <div class="h-2 bg-gray-800/80 rounded-full overflow-hidden border border-gray-700/50">
+                        <div id="angleBar" class="h-full bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 transition-all duration-100" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <!-- 当前冲程 -->
+                <div class="mb-4 p-3 bg-gradient-to-br from-gray-800/50 to-gray-900/50 rounded-xl border border-gray-700/50">
+                    <div class="text-[10px] text-gray-500 mb-1 flex items-center gap-1">
+                        <i class="fas fa-info-circle"></i>
+                        当前冲程
+                    </div>
+                    <div id="strokeName" class="font-tech text-lg font-bold text-yellow-400 mb-0.5">进气冲程</div>
+                    <div id="strokeDesc" class="text-[10px] text-gray-400 leading-relaxed">活塞下行，进气门开启，混合气进入气缸</div>
+                </div>
+                
+                <!-- 气缸参数 -->
+                <div class="grid grid-cols-2 gap-2 mb-4">
+                    <div class="stat-card p-3 rounded-xl">
+                        <div class="flex items-center gap-1.5 text-[10px] text-gray-500 mb-1">
+                            <div class="w-5 h-5 rounded bg-green-500/10 flex items-center justify-center">
+                                <i class="fas fa-compress-arrows-alt text-green-400 text-[8px]"></i>
+                            </div>
+                            气缸压力
+                        </div>
+                        <div id="pressureDisplay" class="font-tech text-base text-green-400">0.10<span class="text-[10px] text-gray-500 ml-0.5">MPa</span></div>
+                    </div>
+                    <div class="stat-card p-3 rounded-xl">
+                        <div class="flex items-center gap-1.5 text-[10px] text-gray-500 mb-1">
+                            <div class="w-5 h-5 rounded bg-orange-500/10 flex items-center justify-center">
+                                <i class="fas fa-thermometer-half text-orange-400 text-[8px]"></i>
+                            </div>
+                            气缸温度
+                        </div>
+                        <div id="tempDisplay" class="font-tech text-base text-orange-400">25<span class="text-[10px] text-gray-500 ml-0.5">°C</span></div>
+                    </div>
+                </div>
+                
+                <!-- 阀门状态 -->
+                <div class="space-y-2 mb-4">
+                    <div class="flex justify-between items-center p-2.5 bg-gradient-to-r from-gray-800/30 to-gray-900/30 rounded-xl border border-gray-700/30">
+                        <span class="text-xs text-gray-400 flex items-center gap-2">
+                            <div class="w-6 h-6 rounded bg-blue-500/10 flex items-center justify-center">
+                                <i class="fas fa-arrow-down text-blue-400 text-xs"></i>
+                            </div>
+                            进气门
+                        </span>
+                        <span id="intakeValveStatus" class="font-tech text-xs text-red-400 px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/20">关闭</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2.5 bg-gradient-to-r from-gray-800/30 to-gray-900/30 rounded-xl border border-gray-700/30">
+                        <span class="text-xs text-gray-400 flex items-center gap-2">
+                            <div class="w-6 h-6 rounded bg-gray-500/10 flex items-center justify-center">
+                                <i class="fas fa-arrow-up text-gray-400 text-xs"></i>
+                            </div>
+                            排气门
+                        </span>
+                        <span id="exhaustValveStatus" class="font-tech text-xs text-red-400 px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/20">关闭</span>
+                    </div>
+                </div>
+                
+                <!-- 活塞位置 -->
+                <div class="p-2.5 bg-gray-800/20 rounded-xl border border-gray-700/30">
+                    <div class="flex justify-between text-xs text-gray-400 mb-1.5">
+                        <span class="flex items-center gap-1.5">
+                            <i class="fas fa-arrows-alt-v text-purple-500/50 text-[10px]"></i>
+                            活塞位置
+                        </span>
+                        <span id="pistonPositionDisplay" class="font-tech text-cyan-400">上止点</span>
+                    </div>
+                    <div class="h-2 bg-gray-800/80 rounded-full overflow-hidden border border-gray-700/50">
+                        <div id="pistonBar" class="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-rose-500 transition-all duration-100" style="width: 0%"></div>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-gray-500 mt-1.5">
+                        <span>TDC</span>
+                        <span>BDC</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 中间：Canvas 动画区域 -->
+        <div class="flex-1 flex flex-col">
+            <div class="flex-1 canvas-container rounded-2xl p-4 relative min-h-[500px] lg:min-h-0">
+                <div class="absolute top-2 left-3 flex items-center gap-2 text-xs text-cyan-500/60 font-tech">
+                    <i class="fas fa-crosshairs"></i>
+                    <span>ENGINE VIEWPORT</span>
+                </div>
+                <div class="absolute top-2 right-3 flex items-center gap-2">
+                    <div id="statusIndicator" class="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)] transition-all duration-300"></div>
+                    <span id="statusText" class="text-xs text-gray-500 font-tech">STANDBY</span>
+                </div>
+                <canvas id="engineCanvas" class="w-full h-full rounded-lg mt-5"></canvas>
+                
+                <!-- 粒子画布层 -->
+                <canvas id="particleCanvas" class="absolute inset-4 rounded-lg pointer-events-none mt-5"></canvas>
+                
+                <!-- 底部装饰 -->
+                <div class="absolute bottom-2 left-4 right-4 flex justify-between items-center text-xs text-gray-600 font-tech">
+                    <span>θ: <span id="angleReadout">000</span>°</span>
+                    <span>PHASE: <span id="phaseReadout">INTAKE</span></span>
+                    <span>RPM: <span id="rpmReadout">0</span></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧：冲程指示器 + 控制面板 -->
+        <div class="w-full lg:w-[320px] xl:w-[340px] flex flex-col gap-4">
+            
+            <!-- 冲程指示器 -->
+            <div class="panel-glass rounded-2xl p-4">
+                <h2 class="font-tech text-base font-semibold text-cyan-400 mb-3 flex items-center">
+                    <i class="fas fa-list-ol mr-2"></i>
+                    冲程指示器
+                    <span class="ml-auto text-[10px] text-gray-500 font-normal">点击跳转</span>
+                </h2>
+                
+                <div class="space-y-2" id="strokeIndicators">
+                    <div class="stroke-indicator p-3 rounded-xl border border-gray-700/50 bg-gradient-to-r from-gray-800/20 to-transparent" data-stroke="0">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/20 to-blue-600/10 flex items-center justify-center border border-blue-500/30">
+                                    <span class="text-blue-400 font-tech font-bold text-sm">1</span>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-gray-200 text-sm">进气冲程</div>
+                                    <div class="text-[10px] text-gray-500">进气门开，活塞下行</div>
+                                </div>
+                            </div>
+                            <span class="font-tech text-[10px] text-blue-400/60 bg-blue-500/10 px-1.5 py-0.5 rounded">0°-180°</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stroke-indicator p-3 rounded-xl border border-gray-700/50 bg-gradient-to-r from-gray-800/20 to-transparent" data-stroke="1">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 flex items-center justify-center border border-yellow-500/30">
+                                    <span class="text-yellow-400 font-tech font-bold text-sm">2</span>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-gray-200 text-sm">压缩冲程</div>
+                                    <div class="text-[10px] text-gray-500">阀门关闭，活塞上行</div>
+                                </div>
+                            </div>
+                            <span class="font-tech text-[10px] text-yellow-400/60 bg-yellow-500/10 px-1.5 py-0.5 rounded">180°-360°</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stroke-indicator p-3 rounded-xl border border-gray-700/50 bg-gradient-to-r from-gray-800/20 to-transparent" data-stroke="2">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500/20 to-orange-600/10 flex items-center justify-center border border-orange-500/30">
+                                    <span class="text-orange-400 font-tech font-bold text-sm">3</span>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-gray-200 text-sm">做功冲程</div>
+                                    <div class="text-[10px] text-gray-500">火花塞点火，活塞下行</div>
+                                </div>
+                            </div>
+                            <span class="font-tech text-[10px] text-orange-400/60 bg-orange-500/10 px-1.5 py-0.5 rounded">360°-540°</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stroke-indicator p-3 rounded-xl border border-gray-700/50 bg-gradient-to-r from-gray-800/20 to-transparent" data-stroke="3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-gray-500/20 to-gray-600/10 flex items-center justify-center border border-gray-500/30">
+                                    <span class="text-gray-400 font-tech font-bold text-sm">4</span>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-gray-200 text-sm">排气冲程</div>
+                                    <div class="text-[10px] text-gray-500">排气门开，活塞上行</div>
+                                </div>
+                            </div>
+                            <span class="font-tech text-[10px] text-gray-400/60 bg-gray-500/10 px-1.5 py-0.5 rounded">540°-720°</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 控制面板 -->
+            <div class="panel-glass rounded-2xl p-4">
+                <h2 class="font-tech text-base font-semibold text-cyan-400 mb-3 flex items-center">
+                    <i class="fas fa-sliders-h mr-2"></i>
+                    控制面板
+                </h2>
+                
+                <!-- 播放控制 -->
+                <div class="flex justify-center gap-2 mb-4">
+                    <button id="resetBtn" class="btn-tech w-10 h-10 rounded-xl flex items-center justify-center text-gray-300" title="重置 (R)">
+                        <i class="fas fa-undo text-sm"></i>
+                    </button>
+                    <button id="stepBackBtn" class="btn-tech w-10 h-10 rounded-xl flex items-center justify-center text-gray-300" title="后退 (←)">
+                        <i class="fas fa-step-backward text-sm"></i>
+                    </button>
+                    <button id="playPauseBtn" class="btn-tech px-6 h-10 rounded-xl flex items-center justify-center text-cyan-400 glow-blue min-w-[100px]" title="播放/暂停 (空格)">
+                        <i class="fas fa-play mr-1.5 text-sm"></i><span id="playText" class="text-sm">播放</span>
+                    </button>
+                    <button id="stepForwardBtn" class="btn-tech w-10 h-10 rounded-xl flex items-center justify-center text-gray-300" title="前进 (→)">
+                        <i class="fas fa-step-forward text-sm"></i>
+                    </button>
+                </div>
+                
+                <!-- 速度控制 -->
+                <div class="mb-4 p-3 bg-gray-800/20 rounded-xl border border-gray-700/30">
+                    <div class="flex justify-between text-xs text-gray-400 mb-2">
+                        <span class="flex items-center gap-1.5">
+                            <i class="fas fa-tachometer-alt text-cyan-500/50 text-[10px]"></i>
+                            播放速度
+                        </span>
+                        <span id="speedDisplay" class="font-tech text-cyan-400">1.0x</span>
+                    </div>
+                    <input type="range" id="speedSlider" class="slider-tech w-full" min="0.2" max="3" step="0.1" value="1">
+                    <div class="flex justify-between text-[10px] text-gray-600 mt-1 font-tech">
+                        <span>0.2x</span>
+                        <span>3.0x</span>
+                    </div>
+                </div>
+                
+                <!-- 角度控制 -->
+                <div class="p-3 bg-gray-800/20 rounded-xl border border-gray-700/30 mb-4">
+                    <div class="flex justify-between text-xs text-gray-400 mb-2">
+                        <span class="flex items-center gap-1.5">
+                            <i class="fas fa-hand-pointer text-cyan-500/50 text-[10px]"></i>
+                            手动调节角度
+                        </span>
+                        <span id="manualAngleDisplay" class="font-tech text-cyan-400">0°</span>
+                    </div>
+                    <input type="range" id="angleSlider" class="slider-tech w-full" min="0" max="720" step="1" value="0">
+                    <div class="flex justify-between text-[10px] text-gray-600 mt-1 font-tech">
+                        <span>0°</span>
+                        <span>720°</span>
+                    </div>
+                </div>
+                
+                <!-- 快捷键提示 -->
+                <div class="pt-3 border-t border-gray-700/30">
+                    <div class="font-tech text-cyan-400 mb-2 flex items-center gap-1.5 text-xs">
+                        <i class="fas fa-keyboard text-[10px]"></i>
+                        键盘快捷键
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="flex items-center gap-1.5 text-gray-400">
+                            <kbd class="px-2 py-1 rounded font-tech text-[10px] min-w-[40px] text-center">SPACE</kbd>
+                            <span class="text-[10px]">播放/暂停</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-gray-400">
+                            <kbd class="px-2 py-1 rounded font-tech text-[10px] min-w-[40px] text-center">← →</kbd>
+                            <span class="text-[10px]">步进</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-gray-400">
+                            <kbd class="px-2 py-1 rounded font-tech text-[10px] min-w-[40px] text-center">R</kbd>
+                            <span class="text-[10px]">重置</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 text-gray-400">
+                            <kbd class="px-2 py-1 rounded font-tech text-[10px] min-w-[40px] text-center">1-4</kbd>
+                            <span class="text-[10px]">跳转冲程</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ============================================
+    // 四冲程发动机动画演示系统
+    // ============================================
+    
+    // roundRect Polyfill (兼容性处理)
+    if (!CanvasRenderingContext2D.prototype.roundRect) {
+        CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+            if (w < 2 * r) r = w / 2;
+            if (h < 2 * r) r = h / 2;
+            this.beginPath();
+            this.moveTo(x + r, y);
+            this.arcTo(x + w, y, x + w, y + h, r);
+            this.arcTo(x + w, y + h, x, y + h, r);
+            this.arcTo(x, y + h, x, y, r);
+            this.arcTo(x, y, x + w, y, r);
+            this.closePath();
+            return this;
+        };
+    }
+    
+    // ============================================
+    // 配置常量
+    // ============================================
+    const CONFIG = {
+        // 发动机尺寸参数
+        cylinderWidth: 120,
+        cylinderHeight: 120,  // 气缸高度 = 活塞行程 + 余量
+        pistonWidth: 100,
+        pistonHeight: 50,
+        crankRadius: 40,      // 曲柄半径 (等于活塞行程的一半)
+        rodLength: 140,       // 连杆长度
+        crankCenterX: 0,      // 将在初始化时设置
+        crankCenterY: 0,      // 将在初始化时设置
+        
+        // 阀门参数
+        valveWidth: 30,
+        valveHeight: 8,
+        maxValveLift: 25,
+        
+        // 动画参数
+        baseSpeed: 0.5,       // 基础速度 (度/帧)
+        
+        // 颜色配置
+        colors: {
+            cylinder: '#2a2a3e',
+            cylinderStroke: '#3a3a5e',
+            piston: '#4a5568',
+            pistonRing: '#718096',
+            rod: '#5a6a7a',
+            crank: '#4a90a4',
+            crankPin: '#6a5acd',
+            flywheel: '#3a4a5a',
+            intakeValve: '#3498db',
+            exhaustValve: '#95a5a6',
+            sparkPlug: '#e74c3c',
+            gas: 'rgba(100, 200, 255, 0.3)',
+            fire: 'rgba(255, 150, 50, 0.8)',
+            exhaust: 'rgba(100, 100, 100, 0.5)'
+        }
+    };
+    
+    // ============================================
+    // 状态管理
+    // ============================================
+    const state = {
+        angle: 0,             // 曲轴角度 (0-720)
+        isPlaying: false,
+        speed: 1.0,
+        lastTime: 0,
+        particles: [],
+        strokePhase: 0,       // 0=进气, 1=压缩, 2=做功, 3=排气
+        pressure: 0.1,        // MPa
+        temperature: 25       // °C
+    };
+    
+    // ============================================
+    // 粒子系统
+    // ============================================
+    class Particle {
+        constructor(x, y, type) {
+            this.x = x;
+            this.y = y;
+            this.type = type; // 'intake', 'fire', 'exhaust'
+            this.life = 1.0;
+            this.decay = 0.01 + Math.random() * 0.02;
+            
+            switch(type) {
+                case 'intake':
+                    this.vx = (Math.random() - 0.5) * 2;
+                    this.vy = Math.random() * 2 + 1;
+                    this.color = `rgba(100, 200, 255, ${0.6 + Math.random() * 0.4})`;
+                    this.size = 2 + Math.random() * 3;
+                    break;
+                case 'fire':
+                    this.vx = (Math.random() - 0.5) * 8;
+                    this.vy = (Math.random() - 0.5) * 8;
+                    this.color = `rgba(255, ${100 + Math.random() * 100}, 0, ${0.8 + Math.random() * 0.2})`;
+                    this.size = 3 + Math.random() * 4;
+                    this.decay = 0.03;
+                    break;
+                case 'exhaust':
+                    this.vx = (Math.random() - 0.5) * 3;
+                    this.vy = -Math.random() * 2 - 1;
+                    this.color = `rgba(100, 100, 100, ${0.4 + Math.random() * 0.3})`;
+                    this.size = 2 + Math.random() * 3;
+                    break;
+            }
+        }
+        
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life -= this.decay;
+            
+            if (this.type === 'fire') {
+                this.vx *= 0.95;
+                this.vy *= 0.95;
+            }
+        }
+        
+        draw(ctx) {
+            ctx.save();
+            ctx.globalAlpha = this.life;
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 发光效果
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = this.color;
+            ctx.fill();
+            ctx.restore();
+        }
+    }
+    
+    // ============================================
+    // 物理计算函数
+    // ============================================
+    
+    // 计算活塞位置 (基于曲柄连杆机构公式)
+    function getPistonPosition(r, L, theta) {
+        const rad = theta * Math.PI / 180;
+        // x = r(1-cosθ) + L(1-√(1-(r/L*sinθ)²))
+        const term1 = r * (1 - Math.cos(rad));
+        const term2 = L * (1 - Math.sqrt(1 - Math.pow(r / L * Math.sin(rad), 2)));
+        return term1 + term2;
+    }
+    
+    // 计算连杆角度
+    function getRodAngle(r, L, theta) {
+        const rad = theta * Math.PI / 180;
+        const sinBeta = (r / L) * Math.sin(rad);
+        return Math.asin(sinBeta) * 180 / Math.PI;
+    }
+    
+    // 获取阀门升程
+    function getValveLift(angle, start, end, maxLift) {
+        if (angle < start || angle > end) return 0;
+        const progress = (angle - start) / (end - start);
+        // 使用正弦曲线模拟阀门升程
+        return maxLift * Math.sin(progress * Math.PI);
+    }
+    
+    // 获取当前冲程
+    function getStroke(angle) {
+        const normalized = angle % 720;
+        if (normalized < 180) return { 
+            index: 0,
+            name: '进气冲程', 
+            shortName: '进气',
+            desc: '活塞下行，进气门开启，混合气进入气缸',
+            color: '#3498db'
+        };
+        if (normalized < 360) return { 
+            index: 1,
+            name: '压缩冲程', 
+            shortName: '压缩',
+            desc: '活塞上行，阀门关闭，混合气被压缩',
+            color: '#f1c40f'
+        };
+        if (normalized < 540) return { 
+            index: 2,
+            name: '做功冲程', 
+            shortName: '做功',
+            desc: '火花塞点火，燃气膨胀推动活塞下行',
+            color: '#e67e22'
+        };
+        return { 
+            index: 3,
+            name: '排气冲程', 
+            shortName: '排气',
+            desc: '活塞上行，排气门开启，废气排出',
+            color: '#95a5a6'
+        };
+    }
+    
+    // 计算气缸压力和温度 (简化模型)
+    function updateEngineParameters(angle) {
+        const normalized = angle % 720;
+        
+        if (normalized < 180) {
+            // 进气: 压力略低于大气压，温度接近环境温度
+            state.pressure = 0.08 + Math.sin(normalized * Math.PI / 180) * 0.02;
+            state.temperature = 25 + Math.sin(normalized * Math.PI / 180) * 5;
+        } else if (normalized < 360) {
+            // 压缩: 压力和温度上升
+            const progress = (normalized - 180) / 180;
+            state.pressure = 0.1 + progress * 1.4;
+            state.temperature = 25 + progress * 350;
+        } else if (normalized < 540) {
+            // 做功: 爆发压力和高温
+            const progress = (normalized - 360) / 180;
+            if (progress < 0.1) {
+                // 点火瞬间
+                state.pressure = 1.5 + progress * 20;
+                state.temperature = 375 + progress * 2000;
+            } else {
+                // 膨胀
+                state.pressure = 3.5 - (progress - 0.1) * 3.3;
+                state.temperature = 575 - (progress - 0.1) * 400;
+            }
+        } else {
+            // 排气
+            const progress = (normalized - 540) / 180;
+            state.pressure = 0.2 - progress * 0.1;
+            state.temperature = 175 - progress * 150;
+        }
+    }
+    
+    // ============================================
+    // Canvas 绘制函数
+    // ============================================
+    const canvas = document.getElementById('engineCanvas');
+    const ctx = canvas.getContext('2d');
+    const particleCanvas = document.getElementById('particleCanvas');
+    const pCtx = particleCanvas.getContext('2d');
+    
+    // 设置画布尺寸
+    function resizeCanvas() {
+        const container = canvas.parentElement;
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight;
+        particleCanvas.width = container.clientWidth;
+        particleCanvas.height = container.clientHeight;
+        
+        // 设置曲轴中心位置 - 使发动机模型在画布中垂直居中
+        CONFIG.crankCenterX = canvas.width / 2;
+        CONFIG.crankCenterY = canvas.height * 0.55;
+    }
+    
+    // 绘制气缸
+    function drawCylinder() {
+        const cx = CONFIG.crankCenterX;
+        // 气缸顶部在活塞上止点上方一点
+        const cy = CONFIG.crankCenterY - CONFIG.crankRadius - CONFIG.rodLength - CONFIG.pistonHeight/2 - 10;
+        const w = CONFIG.cylinderWidth;
+        // 气缸高度覆盖活塞行程 + 余量
+        const h = CONFIG.crankRadius * 2 + CONFIG.pistonHeight + 20;
+        
+        // 气缸主体
+        ctx.fillStyle = CONFIG.colors.cylinder;
+        ctx.strokeStyle = CONFIG.colors.cylinderStroke;
+        ctx.lineWidth = 3;
+        
+        ctx.beginPath();
+        ctx.roundRect(cx - w/2 - 10, cy - 10, w + 20, h + 20, 10);
+        ctx.fill();
+        ctx.stroke();
+        
+        // 气缸内部 (剖面)
+        ctx.fillStyle = 'rgba(10, 10, 15, 0.8)';
+        ctx.beginPath();
+        ctx.roundRect(cx - w/2, cy, w, h, 5);
+        ctx.fill();
+        
+        // 气缸顶部
+        ctx.fillStyle = '#1a1a2e';
+        ctx.fillRect(cx - w/2 - 5, cy - 5, w + 10, 15);
+        ctx.strokeRect(cx - w/2 - 5, cy - 5, w + 10, 15);
+        
+        // 气缸壁高光
+        ctx.strokeStyle = 'rgba(100, 200, 255, 0.1)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(cx - w/2 + 5, cy + 10);
+        ctx.lineTo(cx - w/2 + 5, cy + h - 10);
+        ctx.stroke();
+    }
+    
+    // 绘制活塞
+    function drawPiston(pistonY) {
+        const cx = CONFIG.crankCenterX;
+        const w = CONFIG.pistonWidth;
+        const h = CONFIG.pistonHeight;
+        const x = cx - w/2;
+        const y = pistonY;
+        
+        // 活塞主体
+        const gradient = ctx.createLinearGradient(x, y, x + w, y);
+        gradient.addColorStop(0, '#3a4a5a');
+        gradient.addColorStop(0.5, '#5a6a7a');
+        gradient.addColorStop(1, '#3a4a5a');
+        ctx.fillStyle = gradient;
+        ctx.strokeStyle = CONFIG.colors.piston;
+        ctx.lineWidth = 2;
+        
+        ctx.beginPath();
+        ctx.roundRect(x, y, w, h, 8);
+        ctx.fill();
+        ctx.stroke();
+        
+        // 活塞环
+        ctx.strokeStyle = CONFIG.colors.pistonRing;
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 3; i++) {
+            ctx.beginPath();
+            ctx.moveTo(x + 5, y + 10 + i * 8);
+            ctx.lineTo(x + w - 5, y + 10 + i * 8);
+            ctx.stroke();
+        }
+        
+        // 活塞销
+        ctx.fillStyle = '#6a7a8a';
+        ctx.beginPath();
+        ctx.arc(cx, y + h/2, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#8a9aaa';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        
+        return { x: cx, y: y + h/2 }; // 返回活塞销位置
+    }
+    
+    // 绘制连杆
+    function drawConnectingRod(pistonPin, crankPin) {
+        const angle = Math.atan2(pistonPin.y - crankPin.y, pistonPin.x - crankPin.x);
+        const length = Math.sqrt(Math.pow(pistonPin.x - crankPin.x, 2) + Math.pow(pistonPin.y - crankPin.y, 2));
+        
+        ctx.save();
+        ctx.translate(crankPin.x, crankPin.y);
+        ctx.rotate(angle);
+        
+        // 连杆主体
+        const gradient = ctx.createLinearGradient(0, -8, 0, 8);
+        gradient.addColorStop(0, '#4a5a6a');
+        gradient.addColorStop(0.5, '#6a7a8a');
+        gradient.addColorStop(1, '#4a5a6a');
+        ctx.fillStyle = gradient;
+        ctx.strokeStyle = CONFIG.colors.rod;
+        ctx.lineWidth = 1;
+        
+        ctx.beginPath();
+        ctx.roundRect(0, -8, length, 16, 4);
+        ctx.fill();
+        ctx.stroke();
+        
+        // 连杆盖
+        ctx.fillStyle = '#5a6a7a';
+        ctx.beginPath();
+        ctx.arc(0, 0, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.arc(length, 0, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+        ctx.restore();
+    }
+    
+    // 绘制曲轴
+    function drawCrankshaft(angle) {
+        const cx = CONFIG.crankCenterX;
+        const cy = CONFIG.crankCenterY;
+        const r = CONFIG.crankRadius;
+        const rad = angle * Math.PI / 180;
+        
+        // 主轴颈
+        ctx.fillStyle = '#4a5a6a';
+        ctx.strokeStyle = '#6a7a8a';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 15, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+        // 曲柄臂
+        ctx.fillStyle = CONFIG.colors.crank;
+        ctx.strokeStyle = '#5a9ab0';
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(rad);
+        
+        // 曲柄 (配重)
+        ctx.beginPath();
+        ctx.moveTo(-20, -15);
+        ctx.lineTo(20, -15);
+        ctx.lineTo(35, 10);
+        ctx.lineTo(20, 40);
+        ctx.lineTo(-20, 40);
+        ctx.lineTo(-35, 10);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        
+        ctx.restore();
+        
+        // 曲柄销
+        const pinX = cx + Math.cos(rad) * r;
+        const pinY = cy + Math.sin(rad) * r;
+        
+        ctx.fillStyle = CONFIG.colors.crankPin;
+        ctx.strokeStyle = '#8a7acd';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(pinX, pinY, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+        // 中心点标记
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(pinX, pinY, 4, 0, Math.PI * 2);
+        ctx.fill();
+        
+        return { x: pinX, y: pinY }; // 返回曲柄销位置
+    }
+    
+    // 绘制飞轮
+    function drawFlywheel(angle) {
+        const cx = CONFIG.crankCenterX - 120;
+        const cy = CONFIG.crankCenterY;
+        const radius = 50;
+        const rad = angle * Math.PI / 180;
+        
+        // 飞轮主体
+        ctx.fillStyle = CONFIG.colors.flywheel;
+        ctx.strokeStyle = '#5a6a7a';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+        // 飞轮齿圈
+        ctx.strokeStyle = '#4a5a6a';
+        ctx.lineWidth = 2;
+        for (let i = 0; i < 24; i++) {
+            const a = (i / 24) * Math.PI * 2 + rad * 0.5;
+            ctx.beginPath();
+            ctx.moveTo(cx + Math.cos(a) * (radius - 5), cy + Math.sin(a) * (radius - 5));
+            ctx.lineTo(cx + Math.cos(a) * radius, cy + Math.sin(a) * radius);
+            ctx.stroke();
+        }
+        
+        // 角度标记
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(rad * 0.5);
+        ctx.fillStyle = '#7a8a9a';
+        for (let i = 0; i < 4; i++) {
+            ctx.beginPath();
+            ctx.arc(30, 0, 3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.rotate(Math.PI / 2);
+        }
+        ctx.restore();
+        
+        // 连接轴
+        ctx.strokeStyle = '#5a6a7a';
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.moveTo(cx + radius, cy);
+        ctx.lineTo(CONFIG.crankCenterX - 30, cy);
+        ctx.stroke();
+    }
+    
+    // 绘制阀门
+    function drawValves(angle) {
+        const cx = CONFIG.crankCenterX;
+        // 气缸顶部位置（与drawCylinder一致）
+        const cy = CONFIG.crankCenterY - CONFIG.crankRadius - CONFIG.rodLength - CONFIG.pistonHeight/2 - 10;
+        
+        // 计算阀门升程
+        const intakeLift = getValveLift(angle % 720, 0, 180, CONFIG.maxValveLift);
+        const exhaustLift = getValveLift(angle % 720, 540, 720, CONFIG.maxValveLift);
+        
+        // 进气门 (左侧)
+        const intakeX = cx - 30;
+        const intakeY = cy - 20 - intakeLift;
+        
+        // 气门杆
+        ctx.strokeStyle = '#aaa';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(intakeX, cy - 10);
+        ctx.lineTo(intakeX, intakeY + 5);
+        ctx.stroke();
+        
+        // 气门头部
+        ctx.fillStyle = CONFIG.colors.intakeValve;
+        ctx.beginPath();
+        ctx.moveTo(intakeX - 15, intakeY);
+        ctx.lineTo(intakeX + 15, intakeY);
+        ctx.lineTo(intakeX + 12, intakeY + 8);
+        ctx.lineTo(intakeX - 12, intakeY + 8);
+        ctx.closePath();
+        ctx.fill();
+        
+        // 弹簧
+        ctx.strokeStyle = '#666';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let i = 0; i < 8; i++) {
+            const y = cy - 15 - i * 3;
+            const offset = (i % 2 === 0) ? -3 : 3;
+            if (i === 0) {
+                ctx.moveTo(intakeX + offset, y);
+            } else {
+                ctx.lineTo(intakeX + offset, y);
+            }
+        }
+        ctx.stroke();
+        
+        // 排气门 (右侧)
+        const exhaustX = cx + 30;
+        const exhaustY = cy - 20 - exhaustLift;
+        
+        // 气门杆
+        ctx.strokeStyle = '#aaa';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(exhaustX, cy - 10);
+        ctx.lineTo(exhaustX, exhaustY + 5);
+        ctx.stroke();
+        
+        // 气门头部
+        ctx.fillStyle = CONFIG.colors.exhaustValve;
+        ctx.beginPath();
+        ctx.moveTo(exhaustX - 15, exhaustY);
+        ctx.lineTo(exhaustX + 15, exhaustY);
+        ctx.lineTo(exhaustX + 12, exhaustY + 8);
+        ctx.lineTo(exhaustX - 12, exhaustY + 8);
+        ctx.closePath();
+        ctx.fill();
+        
+        // 弹簧
+        ctx.strokeStyle = '#666';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        for (let i = 0; i < 8; i++) {
+            const y = cy - 15 - i * 3;
+            const offset = (i % 2 === 0) ? -3 : 3;
+            if (i === 0) {
+                ctx.moveTo(exhaustX + offset, y);
+            } else {
+                ctx.lineTo(exhaustX + offset, y);
+            }
+        }
+        ctx.stroke();
+        
+        return { intakeLift, exhaustLift };
+    }
+    
+    // 绘制火花塞
+    function drawSparkPlug(angle) {
+        const cx = CONFIG.crankCenterX;
+        // 气缸顶部位置（与drawCylinder一致）
+        const cy = CONFIG.crankCenterY - CONFIG.crankRadius - CONFIG.rodLength - CONFIG.pistonHeight/2 - 10;
+        
+        // 火花塞主体
+        ctx.fillStyle = '#5a5a6a';
+        ctx.strokeStyle = '#7a7a8a';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(cx - 8, cy - 45, 16, 25, 3);
+        ctx.fill();
+        ctx.stroke();
+        
+        // 电极
+        ctx.strokeStyle = '#aaa';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(cx - 3, cy - 20);
+        ctx.lineTo(cx - 3, cy - 10);
+        ctx.moveTo(cx + 3, cy - 20);
+        ctx.lineTo(cx + 3, cy - 10);
+        ctx.stroke();
+        
+        // 火花效果 (在点火时刻)
+        const normalized = angle % 720;
+        if (normalized >= 360 && normalized < 380) {
+            const sparkIntensity = 1 - Math.abs(normalized - 370) / 10;
+            ctx.strokeStyle = `rgba(255, 255, 100, ${sparkIntensity})`;
+            ctx.lineWidth = 3;
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#ffff00';
+            
+            for (let i = 0; i < 5; i++) {
+                ctx.beginPath();
+                ctx.moveTo(cx, cy - 15);
+                ctx.lineTo(
+                    cx + (Math.random() - 0.5) * 20,
+                    cy - 5 + Math.random() * 15
+                );
+                ctx.stroke();
+            }
+            
+            ctx.shadowBlur = 0;
+        }
+    }
+    
+    // 绘制进排气管
+    function drawPipes(angle) {
+        const cx = CONFIG.crankCenterX;
+        // 气缸顶部位置（与drawCylinder一致）
+        const cy = CONFIG.crankCenterY - CONFIG.crankRadius - CONFIG.rodLength - CONFIG.pistonHeight/2 - 10;
+        
+        // 进气管
+        ctx.fillStyle = 'rgba(52, 152, 219, 0.2)';
+        ctx.strokeStyle = 'rgba(52, 152, 219, 0.5)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(cx - 80, cy - 30);
+        ctx.lineTo(cx - 50, cy - 25);
+        ctx.lineTo(cx - 50, cy - 10);
+        ctx.lineTo(cx - 80, cy - 5);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        
+        // 进气标签
+        ctx.fillStyle = '#3498db';
+        ctx.font = '12px Orbitron';
+        ctx.fillText('INTAKE', cx - 110, cy - 15);
+        
+        // 排气管
+        ctx.fillStyle = 'rgba(149, 165, 166, 0.2)';
+        ctx.strokeStyle = 'rgba(149, 165, 166, 0.5)';
+        ctx.beginPath();
+        ctx.moveTo(cx + 80, cy - 30);
+        ctx.lineTo(cx + 50, cy - 25);
+        ctx.lineTo(cx + 50, cy - 10);
+        ctx.lineTo(cx + 80, cy - 5);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        
+        // 排气标签
+        ctx.fillStyle = '#95a5a6';
+        ctx.fillText('EXHAUST', cx + 85, cy - 15);
+    }
+    
+    // 绘制气缸内气体
+    function drawGas(angle, pistonY) {
+        const cx = CONFIG.crankCenterX;
+        // 气缸顶部和底部位置（与drawCylinder一致）
+        const cylinderTop = CONFIG.crankCenterY - CONFIG.crankRadius - CONFIG.rodLength - CONFIG.pistonHeight/2 - 10;
+        const cylinderBottom = cylinderTop + CONFIG.crankRadius * 2 + CONFIG.pistonHeight + 20;
+        
+        const normalized = angle % 720;
+        let gasGradient;
+        const gasHeight = cylinderBottom - pistonY - CONFIG.pistonHeight;
+        
+        if (normalized < 180) {
+            // 进气 - 蓝色渐变
+            gasGradient = ctx.createLinearGradient(cx, pistonY + CONFIG.pistonHeight, cx, cylinderBottom);
+            gasGradient.addColorStop(0, 'rgba(100, 200, 255, 0.4)');
+            gasGradient.addColorStop(1, 'rgba(50, 150, 255, 0.2)');
+        } else if (normalized < 360) {
+            // 压缩 - 从蓝到淡黄渐变（温度升高）
+            const progress = (normalized - 180) / 180;
+            gasGradient = ctx.createLinearGradient(cx, pistonY + CONFIG.pistonHeight, cx, cylinderBottom);
+            gasGradient.addColorStop(0, `rgba(${100 + progress * 155}, ${200 + progress * 55}, ${255 - progress * 155}, 0.4)`);
+            gasGradient.addColorStop(1, `rgba(${50 + progress * 100}, ${150 + progress * 100}, ${255 - progress * 200}, 0.2)`);
+        } else if (normalized < 540) {
+            // 做功 - 燃烧效果
+            if (normalized < 400) {
+                // 爆发阶段
+                const intensity = 1 - (normalized - 360) / 40;
+                gasGradient = ctx.createRadialGradient(cx, pistonY + 30, 0, cx, pistonY + 30, 60);
+                gasGradient.addColorStop(0, `rgba(255, ${200 - intensity * 100}, 0, ${0.8 * intensity})`);
+                gasGradient.addColorStop(0.5, `rgba(255, ${150 - intensity * 50}, 0, ${0.5 * intensity})`);
+                gasGradient.addColorStop(1, 'rgba(255, 100, 0, 0.1)');
+            } else {
+                // 膨胀阶段
+                const progress = (normalized - 400) / 140;
+                gasGradient = ctx.createLinearGradient(cx, pistonY + CONFIG.pistonHeight, cx, cylinderBottom);
+                gasGradient.addColorStop(0, `rgba(${255 - progress * 155}, ${150 - progress * 50}, 0, ${0.5 - progress * 0.2})`);
+                gasGradient.addColorStop(1, `rgba(${200 - progress * 100}, ${100 - progress * 20}, 0, ${0.3 - progress * 0.1})`);
+            }
+        } else {
+            // 排气 - 灰色废气
+            gasGradient = ctx.createLinearGradient(cx, pistonY + CONFIG.pistonHeight, cx, cylinderBottom);
+            gasGradient.addColorStop(0, 'rgba(150, 150, 150, 0.3)');
+            gasGradient.addColorStop(1, 'rgba(100, 100, 100, 0.15)');
+        }
+        
+        ctx.fillStyle = gasGradient;
+        ctx.fillRect(cx - CONFIG.cylinderWidth/2 + 2, pistonY + CONFIG.pistonHeight, CONFIG.cylinderWidth - 4, gasHeight);
+    }
+    
+    // 生成粒子
+    function generateParticles(angle) {
+        const normalized = angle % 720;
+        const cx = CONFIG.crankCenterX;
+        // 气缸顶部位置（与drawCylinder一致）
+        const cy = CONFIG.crankCenterY - CONFIG.crankRadius - CONFIG.rodLength - CONFIG.pistonHeight/2 - 10;
+        // 计算活塞位置（与主绘制逻辑一致）
+        const pistonPos = getPistonPosition(CONFIG.crankRadius, CONFIG.rodLength, angle);
+        const pistonPinY = CONFIG.crankCenterY - CONFIG.crankRadius - CONFIG.rodLength + pistonPos;
+        const pistonY = pistonPinY - CONFIG.pistonHeight / 2;
+        
+        if (normalized < 180) {
+            // 进气粒子
+            if (Math.random() < 0.3) {
+                state.particles.push(new Particle(cx - 50 + (Math.random() - 0.5) * 20, cy - 20, 'intake'));
+            }
+        } else if (normalized >= 360 && normalized < 380) {
+            // 火花粒子
+            if (Math.random() < 0.8) {
+                state.particles.push(new Particle(cx + (Math.random() - 0.5) * 40, pistonY + 30, 'fire'));
+            }
+        } else if (normalized >= 540) {
+            // 排气粒子
+            if (Math.random() < 0.3) {
+                state.particles.push(new Particle(cx + 50 + (Math.random() - 0.5) * 20, cy - 10, 'exhaust'));
+            }
+        }
+    }
+    
+    // 更新和绘制粒子
+    function updateAndDrawParticles() {
+        pCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+        
+        for (let i = state.particles.length - 1; i >= 0; i--) {
+            const p = state.particles[i];
+            p.update();
+            p.draw(pCtx);
+            
+            if (p.life <= 0) {
+                state.particles.splice(i, 1);
+            }
+        }
+    }
+    
+    // ============================================
+    // 主绘制函数
+    // ============================================
+    function draw() {
+        // 清空画布
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // 绘制各个部件
+        drawCylinder();
+        
+        // 计算活塞位置
+        // 上止点时活塞销位置 = crankCenterY - crankRadius - rodLength
+        // 活塞位移增加时，活塞销向下移动
+        const pistonPos = getPistonPosition(CONFIG.crankRadius, CONFIG.rodLength, state.angle);
+        const pistonPinY = CONFIG.crankCenterY - CONFIG.crankRadius - CONFIG.rodLength + pistonPos;
+        const pistonY = pistonPinY - CONFIG.pistonHeight / 2;
+        
+        // 绘制气体
+        drawGas(state.angle, pistonY);
+        
+        // 绘制进排气管
+        drawPipes(state.angle);
+        
+        // 绘制火花塞
+        drawSparkPlug(state.angle);
+        
+        // 绘制阀门
+        drawValves(state.angle);
+        
+        // 绘制曲轴
+        const crankPin = drawCrankshaft(state.angle);
+        
+        // 绘制飞轮
+        drawFlywheel(state.angle);
+        
+        // 绘制连杆
+        const pistonPin = { x: CONFIG.crankCenterX, y: pistonY + CONFIG.pistonHeight/2 };
+        drawConnectingRod(pistonPin, crankPin);
+        
+        // 绘制活塞
+        drawPiston(pistonY);
+        
+        // 生成和更新粒子
+        generateParticles(state.angle);
+        updateAndDrawParticles();
+    }
+    
+    // ============================================
+    // UI 更新
+    // ============================================
+    function updateUI() {
+        const stroke = getStroke(state.angle);
+        const normalized = state.angle % 720;
+        const intakeLift = getValveLift(normalized, 0, 180, CONFIG.maxValveLift);
+        const exhaustLift = getValveLift(normalized, 540, 720, CONFIG.maxValveLift);
+        const pistonPos = getPistonPosition(CONFIG.crankRadius, CONFIG.rodLength, state.angle);
+        const maxStroke = CONFIG.crankRadius * 2;
+        const pistonPercent = (pistonPos / maxStroke) * 100;
+        
+        // 角度显示
+        document.getElementById('angleDisplay').textContent = Math.floor(state.angle) + '°';
+        document.getElementById('angleBar').style.width = (state.angle / 720 * 100) + '%';
+        document.getElementById('manualAngleDisplay').textContent = Math.floor(state.angle) + '°';
+        
+        // Canvas底部读数
+        document.getElementById('angleReadout').textContent = Math.floor(state.angle).toString().padStart(3, '0');
+        document.getElementById('phaseReadout').textContent = stroke.shortName.toUpperCase();
+        const rpm = state.isPlaying ? Math.round(60 * state.speed) : 0;
+        document.getElementById('rpmReadout').textContent = rpm;
+        
+        // 状态指示器
+        const statusIndicator = document.getElementById('statusIndicator');
+        const statusText = document.getElementById('statusText');
+        const playBtn = document.getElementById('playPauseBtn');
+        if (state.isPlaying) {
+            statusIndicator.className = 'w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.8)] animate-pulse transition-all duration-300';
+            statusText.textContent = 'RUNNING';
+            statusText.className = 'text-xs text-green-500 font-tech';
+            playBtn.classList.add('active');
+        } else {
+            statusIndicator.className = 'w-2 h-2 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)] transition-all duration-300';
+            statusText.textContent = 'STANDBY';
+            statusText.className = 'text-xs text-gray-500 font-tech';
+            playBtn.classList.remove('active');
+        }
+        
+        // 冲程信息
+        document.getElementById('strokeName').textContent = stroke.name;
+        document.getElementById('strokeName').style.color = stroke.color;
+        document.getElementById('strokeDesc').textContent = stroke.desc;
+        
+        // 压力和温度
+        document.getElementById('pressureDisplay').innerHTML = state.pressure.toFixed(2) + '<span class="text-sm text-gray-500 ml-1">MPa</span>';
+        document.getElementById('tempDisplay').innerHTML = Math.floor(state.temperature) + '<span class="text-sm text-gray-500 ml-1">°C</span>';
+        
+        // 阀门状态
+        const intakeStatus = intakeLift > 1 ? `开启 ${intakeLift.toFixed(1)}mm` : '关闭';
+        const exhaustStatus = exhaustLift > 1 ? `开启 ${exhaustLift.toFixed(1)}mm` : '关闭';
+        const intakeEl = document.getElementById('intakeValveStatus');
+        const exhaustEl = document.getElementById('exhaustValveStatus');
+        intakeEl.textContent = intakeStatus;
+        exhaustEl.textContent = exhaustStatus;
+        
+        if (intakeLift > 1) {
+            intakeEl.className = 'font-tech text-sm text-green-400 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20';
+        } else {
+            intakeEl.className = 'font-tech text-sm text-red-400 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20';
+        }
+        if (exhaustLift > 1) {
+            exhaustEl.className = 'font-tech text-sm text-green-400 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20';
+        } else {
+            exhaustEl.className = 'font-tech text-sm text-red-400 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20';
+        }
+        
+        // 活塞位置
+        const positionText = pistonPercent < 10 ? '上止点' : (pistonPercent > 90 ? '下止点' : `${pistonPercent.toFixed(1)}%`);
+        document.getElementById('pistonPositionDisplay').textContent = positionText;
+        document.getElementById('pistonBar').style.width = pistonPercent + '%';
+        
+        // 冲程指示器高亮
+        document.querySelectorAll('.stroke-indicator').forEach((el, index) => {
+            if (index === stroke.index) {
+                el.classList.add('stroke-active');
+            } else {
+                el.classList.remove('stroke-active');
+            }
+        });
+        
+        // 更新滑块位置 (如果动画正在播放)
+        if (state.isPlaying) {
+            document.getElementById('angleSlider').value = state.angle;
+        }
+    }
+    
+    // ============================================
+    // 动画循环
+    // ============================================
+    function animate(currentTime) {
+        if (state.isPlaying) {
+            const deltaTime = currentTime - state.lastTime;
+            if (deltaTime >= 16) { // 约60fps
+                state.angle += CONFIG.baseSpeed * state.speed;
+                if (state.angle >= 720) {
+                    state.angle = 0;
+                }
+                state.lastTime = currentTime;
+            }
+        }
+        
+        updateEngineParameters(state.angle);
+        draw();
+        updateUI();
+        
+        requestAnimationFrame(animate);
+    }
+    
+    // ============================================
+    // 事件处理
+    // ============================================
+    
+    // 播放/暂停
+    document.getElementById('playPauseBtn').addEventListener('click', () => {
+        state.isPlaying = !state.isPlaying;
+        const btn = document.getElementById('playPauseBtn');
+        const text = document.getElementById('playText');
+        const icon = btn.querySelector('i');
+        
+        if (state.isPlaying) {
+            text.textContent = '暂停';
+            icon.className = 'fas fa-pause mr-2';
+            state.lastTime = performance.now();
+        } else {
+            text.textContent = '播放';
+            icon.className = 'fas fa-play mr-2';
+        }
+    });
+    
+    // 重置
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        state.angle = 0;
+        state.isPlaying = false;
+        state.particles = [];
+        document.getElementById('playText').textContent = '播放';
+        document.getElementById('playPauseBtn').querySelector('i').className = 'fas fa-play mr-2';
+        document.getElementById('angleSlider').value = 0;
+    });
+    
+    // 步进
+    document.getElementById('stepForwardBtn').addEventListener('click', () => {
+        state.angle += 10;
+        if (state.angle >= 720) state.angle = 0;
+        document.getElementById('angleSlider').value = state.angle;
+    });
+    
+    document.getElementById('stepBackBtn').addEventListener('click', () => {
+        state.angle -= 10;
+        if (state.angle < 0) state.angle = 710;
+        document.getElementById('angleSlider').value = state.angle;
+    });
+    
+    // 速度滑块
+    document.getElementById('speedSlider').addEventListener('input', (e) => {
+        state.speed = parseFloat(e.target.value);
+        document.getElementById('speedDisplay').textContent = state.speed.toFixed(1) + 'x';
+    });
+    
+    // 角度滑块
+    document.getElementById('angleSlider').addEventListener('input', (e) => {
+        state.angle = parseFloat(e.target.value);
+        state.particles = [];
+    });
+    
+    // 冲程指示器点击
+    document.querySelectorAll('.stroke-indicator').forEach((el, index) => {
+        el.addEventListener('click', () => {
+            state.angle = index * 180;
+            document.getElementById('angleSlider').value = state.angle;
+            state.particles = [];
+        });
+    });
+    
+    // 键盘快捷键
+    document.addEventListener('keydown', (e) => {
+        switch(e.code) {
+            case 'Space':
+                e.preventDefault();
+                document.getElementById('playPauseBtn').click();
+                break;
+            case 'ArrowLeft':
+                document.getElementById('stepBackBtn').click();
+                break;
+            case 'ArrowRight':
+                document.getElementById('stepForwardBtn').click();
+                break;
+            case 'KeyR':
+                document.getElementById('resetBtn').click();
+                break;
+            case 'Digit1':
+                state.angle = 0;
+                document.getElementById('angleSlider').value = 0;
+                state.particles = [];
+                break;
+            case 'Digit2':
+                state.angle = 180;
+                document.getElementById('angleSlider').value = 180;
+                state.particles = [];
+                break;
+            case 'Digit3':
+                state.angle = 360;
+                document.getElementById('angleSlider').value = 360;
+                state.particles = [];
+                break;
+            case 'Digit4':
+                state.angle = 540;
+                document.getElementById('angleSlider').value = 540;
+                state.particles = [];
+                break;
+        }
+    });
+    
+    // 窗口大小调整
+    window.addEventListener('resize', () => {
+        resizeCanvas();
+        draw();
+    });
+    
+    // ============================================
+    // 初始化
+    // ============================================
+    resizeCanvas();
+    requestAnimationFrame(animate);
+    </script>
+</body>
+</html>
